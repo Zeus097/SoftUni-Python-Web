@@ -1,1 +1,6 @@
 __pycache__/ »
+.envrc
+**/.envrc
+venv/
+__pycache__/
+.pyc
