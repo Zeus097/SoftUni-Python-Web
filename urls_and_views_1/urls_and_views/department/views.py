@@ -7,25 +7,36 @@ from department.models import Department
 
 
 def home_page(request):
-    return render(request, 'departments/show_department.html')
+    return HttpResponse('<h1>Hello World! This is Home Page</h1>')
 
 
-def show_department_by_id(request, id):
+def department_page(request):
+    departments = Department.objects.all()
+    return HttpResponse(departments)
+
+
+def show_department_by_id(request, department_id):
     try:
-        department = Department.objects.get(id=id)
-        return HttpResponse(f"<h1>Hello from Department {department.id}</h1>")
+        department = Department.objects.get(pk=department_id)
+        return HttpResponse(f"<h1>Hello from {department.name} with ID: {department_id}</h1>")
     except Department.DoesNotExist:
-        raise Http404
+        return render(request, 'departments/search_by_name.html')
 
 
-def show_department_by_name(request, name):
-    department = Department.objects.get(name=name)
-    return HttpResponse(f"<h1>Hello from Department {department.name}</h1>")
+def show_department_by_name(request, department_name):
+        try:
+            department = Department.objects.get(name=department_name)
+            return HttpResponse(f'<h1>Hello from {department.name}</h1>')
+        except Department.DoesNotExist:
+            raise Http404
 
 
-def show_department_by_slug(request, slug):
-    department = Department.objects.get(slug=slug)
-    return HttpResponse(f"<h1>Hello from Department {department.name}</h1>")
+def show_department_by_slug(request, department_slug):
+    try:
+        department = Department.objects.get(slug=department_slug)
+        return HttpResponse(f'<h1>Hello from {department.name}</h1>')
+    except Department.DoesNotExist:
+        return HttpResponse(f'<h1>Sorry There is no Department with slug: {department_slug}</h1>')
 
 
 def show_departments_by_year(request, year):
@@ -33,9 +44,3 @@ def show_departments_by_year(request, year):
     departments = Department.objects.get(year=year_date)
     return HttpResponse(f"<h1>This Department is from {departments.year}</h1>")
 
-
-def search_department_by_name(request, name):
-    department = Department.objects.filter(name=name)
-    context = {"department": department}
-
-    return render(request, 'departments/search_by_name.html', context)
