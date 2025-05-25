@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Homework</title>
+</head>
+<body>
+    <h1>
+        Hello, my name is {{ full_name }} from {{ address }}
+    </h1>
+    <h2>
+        The purpose of this homework is to practice my knowledge from class..
+    </h2>
+    <div>
+
+        <p>I will write about:</p>
+
+        <ol>
+        {% for department_name in departments %}
+            <a href="">
+                <li>
+                    Department of <b>{{ department_name|truncatechars:10 }}</b>
+                </li>
+            </a>
+        {% endfor %}
+        </ol>
+    </div>
+
+    <h2>
+        To learn more about every <i>department</i>, type it's number on the end of the url on the top..
+    </h2>
+    <p><i>There are {{ departments|length }} departments in this topic.</i></p>
+</body>
+</html>
