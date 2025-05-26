@@ -11,15 +11,7 @@ def homework_view(request):
     context = {
         "full_name": "John Doe",
         "address": "New York",
-        "departments": [
-            'Science',
-            'Art and Masterpiece Collection',
-            'Management and Career Boosting',
-            'Sport and Entertainment',
-            'Politics and Global Problems of Humanity',
-            'Engineering and Robotics',
-            'Technology and Modern Tools for Society'
-        ],
+        "departments": Department.objects.values_list("name", flat=True).order_by("id"),
     }
 
     return render(request, 'homework.html', context)
