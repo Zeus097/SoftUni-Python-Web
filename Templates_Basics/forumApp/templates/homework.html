@@ -17,11 +17,9 @@
 
         <ol>
         {% for department_name in departments %}
-            <a href="">
-                <li>
-                    Department of <b>{{ department_name|truncatechars:10 }}</b>
-                </li>
-            </a>
+            <li>
+                Department of <b>{{ department_name|truncatechars:10 }}</b>
+            </li>
         {% endfor %}
         </ol>
     </div>
