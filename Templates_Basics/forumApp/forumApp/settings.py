@@ -131,7 +131,7 @@ CSRF_COOKIE_HTTPONLY = True   # can't get it with document.cookie
 STATIC_URL = 'static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'staticfiles',
+    BASE_DIR / 'static',
 ]
 
 # Default primary key field type
