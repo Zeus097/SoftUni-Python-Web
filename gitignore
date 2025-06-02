@@ -1,1 +1,8 @@
-ven/ ›
+__pycache__/ »
+.envrc
+**/.envrc
+venv/
+__pycache__/
+.pyc
+.envrc
+.idea/
