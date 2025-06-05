@@ -2,6 +2,32 @@ from django import forms
 from posts.models import Post
 
 
+class DepartmentSearchForm(forms.Form):
+
+    department_id = forms.IntegerField(
+        required=False,
+        widget=forms.NumberInput
+    )
+
+    department_name = forms.CharField(
+        required=True,
+        max_length=50,
+    )
+
+    is_available = forms.BooleanField(
+        label='Available to apply',
+        required=False,
+        widget=forms.CheckboxInput,
+    )
+
+    date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(
+            attrs={'type': 'date'}
+        ),
+    )
+
+
 class PostBaseForm(forms.ModelForm):
     class Meta:
         model = Post

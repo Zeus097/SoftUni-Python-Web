@@ -1,33 +1,35 @@
 from django.db.models import Q
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, HttpResponse
 from django.shortcuts import render, redirect
 from posts.models import Department, Post
-from posts.forms import PostCreateForm, PostEditForm, PostDeleteForm, SearchForm
+from posts.forms import PostCreateForm, PostEditForm, PostDeleteForm, SearchForm, DepartmentSearchForm
 
 
-def homework_view(request):
+def home_view(request):
+    search_form = DepartmentSearchForm(request.POST or None)
+    departments = Department.objects.all()
 
-    context = {
-        "full_name": "John Doe",
-        "address": "New York",
-        "departments": Department.objects.values_list("name", flat=True).order_by("id"),
-    }
-
-    return render(request, 'homework.html', context)
-
-
-def homework_id_view(request, pk):
-    try:
-        department = Department.objects.get(id=pk)
-    except Department.DoesNotExist:
-        return HttpResponseNotFound('<h1>Sorry, Department does not exist</h1>')
+    if request.method == 'GET' and search_form.is_valid():
+        query = search_form.cleaned_data.get('query')
+        departments = departments.filter(
+            Q(id__icontains=query)
+            |
+            Q(name__icontains=query)
+            |
+            Q(date__icontains=query)
+        )
 
     context = {
-        "name": department.name,
-        "date": department.date,
-        "description": department.description,
+        'department': departments,
+        'search_form': search_form
     }
-    return render(request, 'department.html', context)
+
+    return render(request, "home.html", context)
+
+
+def department_view(request):
+    # TODO Logic for department
+    pass
 
 
 def index(request):

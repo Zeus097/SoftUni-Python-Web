@@ -3,8 +3,8 @@ from posts import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('homework/', views.homework_view),
-    path('homework/<int:pk>/', views.homework_id_view),
+    path('home/', views.home_view, name='home'),
+    path('department/', views.department_view, name='department'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('post/', include([
         path('add/', views.add_post, name='add-post'),

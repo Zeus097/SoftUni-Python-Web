@@ -2,11 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Department of {{ name }}</title>
+    <title>Department</title>
 </head>
 <body>
-    <h1>Department of {{ name }} is created at {{ date }}</h1>
-    <h3>{{ description }}</h3>
-    <p><i>Text size ( {{ description|length }} characters!)</i></p>
+
+    {% for department in departments %}
+        <div>
+            <h1>{{ department.name }}</h1>
+            <p>{{ department.id }}</p>
+            <p>{{ department.date }}</p>
+        </div>
+    {% empty %}
+        <h1>No Department match</h1>
+    {% endfor %}
+
 </body>
 </html>
