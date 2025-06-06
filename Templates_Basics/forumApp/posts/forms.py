@@ -1,5 +1,14 @@
 from django import forms
-from posts.models import Post
+from posts.models import Post, Department
+
+
+class CreateDepartmentForm(forms.ModelForm):
+    class Meta:
+        model = Department
+        fields = '__all__'
+        widgets = {
+            'description': forms.TextInput(attrs={'type': 'text'}),
+        }
 
 
 class PostBaseForm(forms.ModelForm):

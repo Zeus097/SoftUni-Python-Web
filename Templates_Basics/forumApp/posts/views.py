@@ -1,10 +1,40 @@
 from django.db.models import Q
 from django.shortcuts import render, redirect
-from posts.models import Post
-from posts.forms import PostCreateForm, PostEditForm, PostDeleteForm, SearchForm
+from posts.models import Post, Department
+from posts.forms import PostCreateForm, PostEditForm, PostDeleteForm, SearchForm, CreateDepartmentForm
+
+
+def list_of_departments_view(request):
+    departments = Department.objects.all().order_by('-id')
+
+    context = {
+        'departments': departments
+    }
+
+    return render(request, 'department/departments.html', context)
+
+
+def add_department_view(request):
+    form = CreateDepartmentForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        return redirect('departments')
+
+    context = {
+        'form': form
+    }
+
+    return render(request, 'department/add_department.html', context)
 
 
 def index(request):
+
+    pass
+
+    # context = {
+    #     'form': form,
+    # }
+
     return render(request, 'index.html')
 
 
