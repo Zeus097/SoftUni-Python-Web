@@ -1,35 +1,7 @@
 from django.db.models import Q
-from django.http import HttpResponseNotFound, HttpResponse
 from django.shortcuts import render, redirect
-from posts.models import Department, Post
-from posts.forms import PostCreateForm, PostEditForm, PostDeleteForm, SearchForm, DepartmentSearchForm
-
-
-def home_view(request):
-    search_form = DepartmentSearchForm(request.POST or None)
-    departments = Department.objects.all()
-
-    if request.method == 'GET' and search_form.is_valid():
-        query = search_form.cleaned_data.get('query')
-        departments = departments.filter(
-            Q(id__icontains=query)
-            |
-            Q(name__icontains=query)
-            |
-            Q(date__icontains=query)
-        )
-
-    context = {
-        'department': departments,
-        'search_form': search_form
-    }
-
-    return render(request, "home.html", context)
-
-
-def department_view(request):
-    # TODO Logic for department
-    pass
+from posts.models import Post
+from posts.forms import PostCreateForm, PostEditForm, PostDeleteForm, SearchForm
 
 
 def index(request):
