@@ -1,7 +1,8 @@
 from django.db.models import Q
 from django.shortcuts import render, redirect
 from posts.models import Post, Department
-from posts.forms import PostCreateForm, PostEditForm, PostDeleteForm, SearchForm, CreateDepartmentForm, SearchDepartmentForm
+from posts.forms import PostCreateForm, PostEditForm, PostDeleteForm, SearchForm, CreateDepartmentForm, \
+    EditDepartmentForm, SearchDepartmentForm, DeleteDepartmentForm
 
 
 def list_of_departments_view(request):
@@ -33,13 +34,32 @@ def add_department_view(request):
 
 
 def edit_department_view(request, pk):
-    pass
+    department = Department.objects.get(pk=pk)
+    form = EditDepartmentForm(request.POST or None, instance=department)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return redirect('departments')
+
+    context = {
+        'form': form
+    }
 
     return render(request, 'department/edit_department.html', context)
 
 
 def delete_department_view(request, pk):
-    pass
+    department = Department.objects.get(pk=pk)
+    form = DeleteDepartmentForm(instance=department)
+
+    if request.method == 'POST':
+        department.delete()
+        return redirect('departments')
+
+    context = {
+        'form': form,
+        'department': department
+    }
 
     return render(request, 'department/delete_department.html', context)
 

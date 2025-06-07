@@ -42,6 +42,8 @@ class SearchDepartmentForm(forms.Form):
 
 
 
+
+
 class PostBaseForm(forms.ModelForm):
     class Meta:
         model = Post

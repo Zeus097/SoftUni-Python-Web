@@ -1,3 +1,7 @@
 {% block content %}
-
+    <form method="post">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit">Edit Department</button>
+    </form>
 {% endblock %}
