@@ -2,13 +2,29 @@ from django import forms
 from posts.models import Post, Department
 
 
-class CreateDepartmentForm(forms.ModelForm):
+class BaseDepartmentForm(forms.ModelForm):
     class Meta:
         model = Department
         fields = '__all__'
         widgets = {
             'description': forms.TextInput(attrs={'type': 'text'}),
         }
+
+
+class CreateDepartmentForm(BaseDepartmentForm):
+    pass
+
+
+class EditDepartmentForm(CreateDepartmentForm):
+    pass
+
+
+class DeleteDepartmentForm(BaseDepartmentForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in self.fields:
+            self.fields[field].disabled = True
 
 
 class SearchDepartmentForm(forms.Form):
@@ -20,6 +36,10 @@ class SearchDepartmentForm(forms.Form):
             attrs={'placeholder': 'Search by name...'}
         )
     )
+
+
+
+
 
 
 class PostBaseForm(forms.ModelForm):

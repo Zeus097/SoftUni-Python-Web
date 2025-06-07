@@ -1,0 +1,11 @@
+{% block content %}
+    <div class="col-md-8 py-4">
+        <h1>{{ department.name|capfirst }}</h1>
+        <div>
+            <a href="{% url 'edit_department' department.pk %}">Edit</a>
+            <a href="{% url 'delete_department' department.pk %}">Delete</a>
+        </div>
+        <h3><i>{{ department.date|date:"D d M Y" }}</i></h3>
+        <h3><i>{{ department.description|truncatewords:10 }}</i></h3>
+    </div>
+{% endblock %}

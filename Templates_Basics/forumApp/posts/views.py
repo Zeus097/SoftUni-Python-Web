@@ -32,6 +32,28 @@ def add_department_view(request):
     return render(request, 'department/add_department.html', context)
 
 
+def edit_department_view(request, pk):
+    pass
+
+    return render(request, 'department/edit_department.html', context)
+
+
+def delete_department_view(request, pk):
+    pass
+
+    return render(request, 'department/delete_department.html', context)
+
+
+def department_details_view(request, pk):
+    department = Department.objects.get(id=pk)
+
+    context = {
+        'department': department
+    }
+
+    return render(request, 'department/department_details.html', context)
+
+
 def index(request):
     return render(request, 'index.html')
 
