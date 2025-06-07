@@ -11,6 +11,17 @@ class CreateDepartmentForm(forms.ModelForm):
         }
 
 
+class SearchDepartmentForm(forms.Form):
+    query = forms.CharField(
+        max_length=30,
+        label='Department: ',
+        required=False,
+        widget=forms.TextInput(
+            attrs={'placeholder': 'Search by name...'}
+        )
+    )
+
+
 class PostBaseForm(forms.ModelForm):
     class Meta:
         model = Post

@@ -1,0 +1,5 @@
+<form class="search-bar" action="{% url 'departments' %}">
+       {% csrf_token %}
+       {{ search_form }}
+       <button>Submit</button>
+</form>

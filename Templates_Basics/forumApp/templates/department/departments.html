@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,24 +7,18 @@
     <title>Departments</title>
 </head>
 <body>
-
-    <div>
-            <h1>
-                Department  <strong><a href="{% url 'add_department' %}">Add</a></strong>
-            </h1>
-            <br/>
-
-    </div>
+    {% include 'department/search_department.html' %}
+   <br/>
 
     {% for department in departments %}
-        <div>
+        <div class="col-md-8 py-4">
             <h1>{{ department.name }}</h1>
             <h3><i>{{ department.date|date:"D d M Y" }}</i></h3>
             <h3><i>{{ department.description|truncatewords:10 }}</i></h3>
         </div>
         <br/>
     {% empty %}
-
+        No Departments.
     {% endfor %}
 
 </body>

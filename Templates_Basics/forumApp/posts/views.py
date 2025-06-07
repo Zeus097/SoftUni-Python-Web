@@ -1,14 +1,19 @@
 from django.db.models import Q
 from django.shortcuts import render, redirect
 from posts.models import Post, Department
-from posts.forms import PostCreateForm, PostEditForm, PostDeleteForm, SearchForm, CreateDepartmentForm
+from posts.forms import PostCreateForm, PostEditForm, PostDeleteForm, SearchForm, CreateDepartmentForm, SearchDepartmentForm
 
 
 def list_of_departments_view(request):
+    search_form = SearchDepartmentForm(request.GET)
     departments = Department.objects.all().order_by('-id')
+    if request.method == "GET" and search_form.is_valid():
+        query = search_form.cleaned_data.get('query')
+        departments = departments.filter(name__icontains=query)
 
     context = {
-        'departments': departments
+        'search_form': search_form,
+        'departments': departments,
     }
 
     return render(request, 'department/departments.html', context)
@@ -28,13 +33,6 @@ def add_department_view(request):
 
 
 def index(request):
-
-    pass
-
-    # context = {
-    #     'form': form,
-    # }
-
     return render(request, 'index.html')
 
 

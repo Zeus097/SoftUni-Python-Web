@@ -4,7 +4,7 @@ from posts import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('departments/', views.list_of_departments_view, name='departments'),
-    path('add_department/', views.add_department_view, name='add_department'),
+    path('departments/add_department/', views.add_department_view, name='add_department'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('post/', include([
         path('add/', views.add_post, name='add-post'),
