@@ -10,6 +10,8 @@
     {% include 'department/search_department.html' %}
    <br/>
 
+    <a href="{% url "add_department" %}">Add Department</a>
+
     {% for department in departments %}
         <div class="col-md-8 py-4">
             <h1>{{ department.name }}</h1>
