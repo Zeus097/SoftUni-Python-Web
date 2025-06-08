@@ -1,8 +1,12 @@
+from dataclasses import fields
+
 from django.db.models import Q
+from django.forms import modelform_factory
 from django.shortcuts import render, redirect
+
 from posts.models import Post, Department
-from posts.forms import PostCreateForm, PostEditForm, PostDeleteForm, SearchForm, CreateDepartmentForm, \
-    EditDepartmentForm, SearchDepartmentForm, DeleteDepartmentForm
+from posts.forms import PostCreateForm, PostEditForm, PostDeleteForm, SearchForm, CommentForm, CommentFormSet, \
+    CreateDepartmentForm, EditDepartmentForm, SearchDepartmentForm, DeleteDepartmentForm
 
 
 def list_of_departments_view(request):
@@ -74,6 +78,14 @@ def department_details_view(request, pk):
     return render(request, 'department/department_details.html', context)
 
 
+
+
+
+
+
+
+
+
 def index(request):
     return render(request, 'index.html')
 
@@ -86,22 +98,23 @@ def dashboard(request):
         query = search_form.cleaned_data.get('query')
         posts = posts.filter(
             Q(title__icontains=query)
-            |
+                |
             Q(content__icontains=query)
-            |
+                |
             Q(author__icontains=query)
         )
 
-        context = {
-            "posts": posts,
-            "search_form": search_form,
-        }
+    context = {
+        "posts": posts,
+        "search_form": search_form,
+    }
 
-        return render(request, "posts/dashboard.html", context)
+    return render(request, 'posts/dashboard.html', context)
 
 
 def add_post(request):
-    form = PostCreateForm(request.POST or None)
+    form = PostCreateForm(request.POST or None, request.FILES or None)
+
     if request.method == "POST" and form.is_valid():
         form.save()
         return redirect('dashboard')
@@ -115,9 +128,15 @@ def add_post(request):
 
 def edit_post(request, pk: int):
     post = Post.objects.get(pk=pk)
-    form = PostEditForm(request.POST or None, instance=post)  # instance=post -> Ще презареди с попълнени данни!
 
-    if request.method == "Post" and form.is_valid():
+    if request.user.is_superuser:
+        PostEditForm = modelform_factory(Post, fields='__all__')
+    else:
+        PostEditForm = modelform_factory(Post, fields=('content',),)
+
+    form = PostEditForm(request.POST or None, instance=post)
+
+    if request.method == "POST" and form.is_valid():
         form.save()
         return redirect('dashboard')
 
@@ -130,9 +149,19 @@ def edit_post(request, pk: int):
 
 def post_details(request, pk: int):
     post = Post.objects.get(pk=pk)
+    comment_form_set = CommentFormSet(request.POST or None)
+
+    if request.method == "POST" and comment_form_set.is_valid():
+        for form in comment_form_set:
+            comment = form.save(commit=False)
+            comment.author = request.user.username
+            comment.post = post
+            comment.save()
+            return redirect('post-details', pk=post.pk)
 
     context = {
         "post": post,
+        "formset": comment_form_set,
     }
 
     return render(request, 'posts/post-details.html', context)

@@ -1,5 +1,10 @@
+from crispy_forms.helper import FormHelper
 from django import forms
-from posts.models import Post, Department
+from django.core.exceptions import ValidationError
+from django.forms import modelformset_factory, formset_factory
+
+from posts.mixins import ReadOnlyFieldsMixin
+from posts.models import Post, Department, Comment
 
 
 class BaseDepartmentForm(forms.ModelForm):
@@ -51,25 +56,61 @@ class PostBaseForm(forms.ModelForm):
 
         widgets = {
             'language': forms.RadioSelect(
-                attrs={'class': 'radio-select'}
+                attrs={'class': 'radio-select'},
             )
         }
+        error_messages = {
+            'author': {
+                'max_length': "Hey thats a lot",
+            }
+        }
+
+    def clean_author(self):
+        author = self.cleaned_data.get('author')
+
+        if not author.isalpha():
+            raise ValidationError('Author name should contain only letters')
+
+        return author
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        title = cleaned_data.get('title')
+        content = cleaned_data.get('content')
+
+        if title.lower() in content.lower():
+            raise ValidationError("The post title shouldn't be included in the content!")
+
+        return cleaned_data
+
+    def save(self, commit=True):
+        post = super().save(commit=False)
+
+        post.author = post.author.capitalize()
+
+        if commit:
+            post.save()
+
+        # send_notifications()...
+
+        return post
 
 
 class PostCreateForm(PostBaseForm):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_id = 'id-exampleForm'
+        self.helper.form_class = 'blueForms'
 
 
 class PostEditForm(PostBaseForm):
     pass
 
 
-class PostDeleteForm(PostBaseForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        for field in self.fields:
-            self.fields[field].disabled = True
+class PostDeleteForm(ReadOnlyFieldsMixin, PostBaseForm):
+    pass
 
 
 class SearchForm(forms.Form):
@@ -81,3 +122,25 @@ class SearchForm(forms.Form):
             attrs={'placeholder': 'Search for posts...'},
         )
     )
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
+
+        labels = {
+            'content': '',
+        }
+
+        widgets = {
+            'content': forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Add a comment...',
+                }
+            )
+        }
+
+
+CommentFormSet = formset_factory(CommentForm, extra=1)
