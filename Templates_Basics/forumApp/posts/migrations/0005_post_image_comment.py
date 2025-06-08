@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='post',
             name='image',
-            field=models.ImageField(blank=True, null=True, upload_to='media_files/'),
+            field=models.ImageField(blank=True, null=True, upload_to='posts/'),
         ),
         migrations.CreateModel(
             name='Comment',
