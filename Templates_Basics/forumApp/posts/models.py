@@ -16,7 +16,7 @@ class Department(models.Model):
             ),
         ],
     )
-    date = models.DateField(auto_now_add=True)
+    date = models.DateField()
     description = models.TextField(
         validators=[
             MinLengthValidator(10)

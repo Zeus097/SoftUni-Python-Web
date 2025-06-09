@@ -14,6 +14,7 @@ class BaseDepartmentForm(forms.ModelForm):
         fields = '__all__'
         widgets = {
             'description': forms.TextInput(attrs={'type': 'text'}),
+            'date': forms.DateInput(attrs={'type': 'date'}),
         }
 
         error_messages = {
@@ -21,6 +22,16 @@ class BaseDepartmentForm(forms.ModelForm):
                 'min_length': "Too short for a description...",
             }
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        name = cleaned_data.get('name')
+        description = cleaned_data.get('description')
+
+        if name.lower() in description.lower():
+            raise ValidationError('Description must not contain Department name')
+
+        return cleaned_data
 
 
 class CreateDepartmentForm(BaseDepartmentForm):
@@ -32,11 +43,7 @@ class EditDepartmentForm(CreateDepartmentForm):
 
 
 class DeleteDepartmentForm(DisabledFieldsMixin, BaseDepartmentForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        for field in self.fields:
-            self.fields[field].disabled = True
+    pass
 
 
 class SearchDepartmentForm(forms.Form):
