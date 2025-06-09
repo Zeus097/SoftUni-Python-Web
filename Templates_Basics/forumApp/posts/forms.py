@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.forms import modelformset_factory, formset_factory
 
-from posts.mixins import ReadOnlyFieldsMixin
+from posts.mixins import ReadOnlyFieldsMixin, DisabledFieldsMixin
 from posts.models import Post, Department, Comment
 
 
@@ -31,7 +31,7 @@ class EditDepartmentForm(CreateDepartmentForm):
     pass
 
 
-class DeleteDepartmentForm(BaseDepartmentForm):
+class DeleteDepartmentForm(DisabledFieldsMixin, BaseDepartmentForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
