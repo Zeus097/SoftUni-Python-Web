@@ -1,3 +1,9 @@
+class InputDateDisabledMixin:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['input_date'].disabled = True
+
+
 class DisabledFieldsMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

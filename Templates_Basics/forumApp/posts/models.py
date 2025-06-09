@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.core.validators import MinLengthValidator
 from django.db import models
 
@@ -17,12 +19,15 @@ class Department(models.Model):
         ],
     )
     date = models.DateField()
+    input_date = models.DateTimeField(
+        default=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    )
     description = models.TextField(
         validators=[
             MinLengthValidator(10)
         ]
     )
-    available = models.BooleanField(default=False)
+    available = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name

@@ -1,14 +1,16 @@
+from django.utils.timezone import now
+
 from crispy_forms.helper import FormHelper
 from django import forms
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.forms import modelformset_factory, formset_factory
 
-from posts.mixins import ReadOnlyFieldsMixin, DisabledFieldsMixin
+from posts.mixins import ReadOnlyFieldsMixin, DisabledFieldsMixin, InputDateDisabledMixin
 from posts.models import Post, Department, Comment
 
 
-class BaseDepartmentForm(forms.ModelForm):
+class BaseDepartmentForm(InputDateDisabledMixin, forms.ModelForm):
     class Meta:
         model = Department
         fields = '__all__'
@@ -22,6 +24,14 @@ class BaseDepartmentForm(forms.ModelForm):
                 'min_length': "Too short for a description...",
             }
         }
+
+    def clean_date(self):
+        date = self.cleaned_data.get('date')
+
+        if date > now().date():
+            raise ValidationError("Date cannot be in the future")
+
+        return date
 
     def clean(self):
         cleaned_data = super().clean()
