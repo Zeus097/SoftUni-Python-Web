@@ -10,7 +10,6 @@
     {% block content %}
 
     {% include 'department/search_department.html' %}
-   <br/>
 
     <form action="{% url "add_department" %}" method="get">
         <label>New Department</label>
@@ -22,8 +21,8 @@
         <a href="{% url 'department_details' department.pk %}">
             <div class="col-md-8 py-4">
                 <h1>{{ department.name }}</h1>
-                <h3><i>{{ department.date|date:"D d M Y" }}</i></h3>
-                <h3><i>{{ department.description|truncatewords:10 }}</i></h3>
+                    <p><i>{{ department.date|date:"D d M Y" }}</i></p>
+                    <p><i>{{ department.description|truncatewords:10 }}</i></p>
             </div>
         </a>
         <br/>

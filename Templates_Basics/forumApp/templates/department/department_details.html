@@ -1,6 +1,9 @@
 {% block content %}
     <div class="col-md-8 py-4">
         <h1>{{ department.name|capfirst }}</h1>
+        {% if department.image %}
+            <img src="{{ department.image.url }}" width="50" height="50" alt="{{ post.title }}" class="img-fluid" />
+        {% endif %}
         <div>
             <a href="{% url 'edit_department' department.pk %}">Edit</a>
             <a href="{% url 'delete_department' department.pk %}">Delete</a>

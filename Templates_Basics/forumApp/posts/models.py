@@ -29,6 +29,12 @@ class Department(models.Model):
     )
     available = models.BooleanField(default=True)
 
+    image = models.ImageField(
+        upload_to='departments/',
+        blank=True,
+        null=True,
+    )
+
     def __str__(self):
         return self.name
 
@@ -73,7 +79,7 @@ class Post(models.Model):
     )
 
     image = models.ImageField(
-        upload_to='',
+        upload_to='posts/',
         blank=True,
         null=True,
     )
