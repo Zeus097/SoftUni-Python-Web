@@ -25,7 +25,11 @@ def list_of_departments_view(request):
 
 
 def add_department_view(request):
-    form = CreateDepartmentForm(request.POST or None)
+    if request.user.is_superuser:
+        form = modelform_factory(Department, fields='__all__')
+    else:
+        form = modelform_factory(Department, exclude=('input_date',))
+
     if request.method == 'POST' and form.is_valid():
         form.save()
         return redirect('departments')
