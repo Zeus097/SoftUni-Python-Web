@@ -43,6 +43,15 @@ class BaseDepartmentForm(InputDateDisabledMixin, forms.ModelForm):
 
         return cleaned_data
 
+    def save(self, commit=True):
+        department = super().save(commit=False)
+        department.name = department.name.capitalize()
+
+        if commit:
+            department.save()
+
+        return department
+
 
 class CreateDepartmentForm(BaseDepartmentForm):
     pass
