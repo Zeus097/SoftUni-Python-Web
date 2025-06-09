@@ -1,13 +1,27 @@
+from django.core.validators import MinLengthValidator
 from django.db import models
 
 from posts.choices import LanguageChoices
-from posts.validators import BadWordValidator
+from posts.validators import BadWordValidator, NotValidDepartmentValidator
 
 
 class Department(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(
+        max_length=100,
+        validators=[
+            NotValidDepartmentValidator(
+                fake_department=[
+                    "porn"
+                ]
+            ),
+        ],
+    )
     date = models.DateField(auto_now_add=True)
-    description = models.TextField()
+    description = models.TextField(
+        validators=[
+            MinLengthValidator(10)
+        ]
+    )
     available = models.BooleanField(default=False)
 
     def __str__(self):

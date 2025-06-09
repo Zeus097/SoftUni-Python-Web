@@ -1,6 +1,7 @@
 from crispy_forms.helper import FormHelper
 from django import forms
 from django.core.exceptions import ValidationError
+from django.core.validators import MinLengthValidator
 from django.forms import modelformset_factory, formset_factory
 
 from posts.mixins import ReadOnlyFieldsMixin
@@ -13,6 +14,12 @@ class BaseDepartmentForm(forms.ModelForm):
         fields = '__all__'
         widgets = {
             'description': forms.TextInput(attrs={'type': 'text'}),
+        }
+
+        error_messages = {
+            'description': {
+                'min_length': "Too short for a description...",
+            }
         }
 
 
@@ -39,7 +46,12 @@ class SearchDepartmentForm(forms.Form):
         required=False,
         widget=forms.TextInput(
             attrs={'placeholder': 'Search by name...'}
-        )
+        ),
+        validators=[
+            MinLengthValidator(
+                5, message="That's too short for a valid Department.."
+            )
+        ],
     )
 
 
