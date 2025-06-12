@@ -42,9 +42,11 @@ def edit_department_view(request, pk):
     department = Department.objects.get(pk=pk)
 
     if request.user.is_superuser:
-        form = modelform_factory(Department, fields='__all__')
+        EditDepartmentForm = modelform_factory(Department, fields='__all__')
     else:
-        form = modelform_factory(Department, fields='description')
+        EditDepartmentForm = modelform_factory(Department, fields=['description'])
+
+    form = EditDepartmentForm(request.POST or None, instance=department)
 
     if request.method == "POST" and form.is_valid():
         form.save()
