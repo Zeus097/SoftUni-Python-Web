@@ -45,7 +45,7 @@
         <div class="comments-section">
             {% for comment in post.comments.all %}
                 <div class="media mb-3 comment-item">
-                    <img class="me-3 rounded-circle comment-avatar" width="50px" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541" />
+                    <img class="me-3 rounded-circle comment-avatar" src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541" />
                     <div class="media-body comment-content">
                         <h5>{{ comment.author }}</h5>
                         <p>{{ comment.content }}</p>

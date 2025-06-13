@@ -1,15 +1,18 @@
 from datetime import datetime
-from dataclasses import fields
 
 from django.db.models import Q
 from django.forms import modelform_factory
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
-from django.views.generic import TemplateView, RedirectView, CreateView, UpdateView, DeleteView, FormView
+from django.utils.decorators import method_decorator
+from django.views.generic import TemplateView, RedirectView, CreateView, UpdateView, DeleteView, FormView, ListView, \
+    DetailView
+from django.views.generic.edit import FormMixin
 
+from posts.decorators import measure_execution_time
 from posts.models import Post, Department
-from posts.forms import PostCreateForm, PostEditForm, PostDeleteForm, SearchForm, CommentForm, CommentFormSet, \
-    CreateDepartmentForm, EditDepartmentForm, SearchDepartmentForm, DeleteDepartmentForm
+from posts.forms import PostCreateForm, PostDeleteForm, SearchForm, CommentFormSet, \
+    CreateDepartmentForm, SearchDepartmentForm, DeleteDepartmentForm
 
 
 def list_of_departments_view(request):
@@ -116,8 +119,8 @@ def department_details_view(request, pk):
 
 
 
-def index(request):
-    return render(request, 'index.html')
+# def index(request):
+#     return render(request, 'index.html')
 
 # Simple example of Django under the hood
 # class MyView:
@@ -157,26 +160,58 @@ class IndexView(TemplateView):
         return ['jhfqwkandoixeu', 'index.html']
 
 
-def dashboard(request):
-    search_form = SearchForm(request.GET)
-    posts = Post.objects.all()
+@method_decorator(name='dispatch', decorator=measure_execution_time)
+class Dashboard(ListView):
+    model = Post
+    template_name = "posts/dashboard.html"
+    paginate_by = 4
+    query_param = "query"
+    form_class = SearchForm
 
-    if request.method == "GET" and search_form.is_valid():
-        query = search_form.cleaned_data.get('query')
-        posts = posts.filter(
-            Q(title__icontains=query)
-                |
-            Q(content__icontains=query)
-                |
-            Q(author__icontains=query)
-        )
+    def get_context_data(self, *, object_list=None, **kwargs):
+        kwargs.update({
+            "search_form": self.form_class(),
+            "query": self.request.GET.get(self.query_param, ''),
+        })
+        return super().get_context_data(object_list=object_list, **kwargs)
 
-    context = {
-        "posts": posts,
-        "search_form": search_form,
-    }
+    def get_queryset(self):
+        queryset = self.model.objects.all()
+        search_value = self.request.GET.get(self.query_param)
 
-    return render(request, 'posts/dashboard.html', context)
+        if search_value:
+            queryset = queryset.filter(
+                Q(title__icontains=search_value)
+                    |
+                Q(content__icontains=search_value)
+                    |
+                Q(author__icontains=search_value)
+            )
+
+        return queryset
+
+
+
+# def dashboard(request):
+#     search_form = SearchForm(request.GET)
+#     posts = Post.objects.all()
+#
+#     if request.method == "GET" and search_form.is_valid():
+#         query = search_form.cleaned_data.get('query')
+#         posts = posts.filter(
+#             Q(title__icontains=query)
+#                 |
+#             Q(content__icontains=query)
+#                 |
+#             Q(author__icontains=query)
+#         )
+#
+#     context = {
+#         "posts": posts,
+#         "search_form": search_form,
+#     }
+#
+#     return render(request, 'posts/dashboard.html', context)
 
 
 class CreatePost(CreateView):
@@ -233,24 +268,51 @@ class EditPost(UpdateView):
 #     return render(request, 'posts/edit-post.html', context)
 
 
-def post_details(request, pk: int):
-    post = Post.objects.get(pk=pk)
-    comment_form_set = CommentFormSet(request.POST or None)
+class PostDetails(DetailView, FormMixin):
+    model = Post
+    template_name = "posts/post-details.html"  # Not needed if named as Django expects
+    form_class = CommentFormSet
 
-    if request.method == "POST" and comment_form_set.is_valid():
-        for form in comment_form_set:
-            comment = form.save(commit=False)
-            comment.author = request.user.username
-            comment.post = post
-            comment.save()
-            return redirect('post-details', pk=post.pk)
+    def get_context_data(self, **kwargs):
+        kwargs.update({
+            "formset": self.get_form_class()(),
+        })
+        return super().get_context_data(**kwargs)
 
-    context = {
-        "post": post,
-        "formset": comment_form_set,
-    }
+    def get_success_url(self):
+        return reverse_lazy('post-details', kwargs={'pk': self.kwargs.get(self.pk_url_kwarg)})
 
-    return render(request, 'posts/post-details.html', context)
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        comment_form_set = self.get_form_class()(request.POST)
+
+        if comment_form_set.is_valid():
+            for form in comment_form_set:
+                comment = form.save(commit=False)
+                comment.author = request.user.username
+                comment.post = self.object
+                comment.save()
+
+            return self.form_valid(comment_form_set)
+
+# def post_details(request, pk: int):
+#     post = Post.objects.get(pk=pk)
+#     comment_form_set = CommentFormSet(request.POST or None)
+#
+#     if request.method == "POST" and comment_form_set.is_valid():
+#         for form in comment_form_set:
+#             comment = form.save(commit=False)
+#             comment.author = request.user.username
+#             comment.post = post
+#             comment.save()
+#             return redirect('post-details', pk=post.pk)
+#
+#     context = {
+#         "post": post,
+#         "formset": comment_form_set,
+#     }
+#
+#     return render(request, 'posts/post-details.html', context)
 
 
 class DeletePost(DeleteView, FormView):
