@@ -188,7 +188,7 @@ class Dashboard(ListView):
                 Q(author__icontains=search_value)
             )
 
-        return queryset
+        return queryset.order_by('-created_at')
 
 
 
