@@ -5,7 +5,11 @@
 <!-- Main Content -->
 <!-- Catalog with Albums-->
 <section id="catalogPage">
-    <h1>All Albums</h1>
+    {% if not album_list %}
+        <p>No Albums in Catalog!</p>
+    {% else %}
+        <h1>All Albums</h1>
+    {% endif %}
     {% for album in album_list %}
     <div class="card-box">
     <img src="{{ album.image_url }}" alt="Cover Image" />
@@ -17,12 +21,10 @@
         <p class="price">Price: ${{ album.price|floatformat:2 }}</p>
         </div>
         <div class="btn-group">
-        <a href="#">Details</a>
+        <a href="{% url 'album_details' album.pk %}">Details</a>
         </div>
     </div>
     </div>
-    {% empty %}
-        <p>No Albums in Catalog!</p>
     {% endfor %}
 </section>
 {% endblock %}
