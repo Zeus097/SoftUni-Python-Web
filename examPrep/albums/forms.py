@@ -11,7 +11,6 @@ class AlbumBaseForm(forms.ModelForm):
         widgets = {
             'album_name': forms.TextInput(attrs={'placeholder': 'Album Name'}),
             'artist_name': forms.TextInput(attrs={'placeholder': 'Artist'}),
-            'genre': forms.TextInput(attrs={'placeholder': 'genre'}),
             'description': forms.Textarea(attrs={'placeholder': 'description'}),
             'image_url': forms.TextInput(attrs={'placeholder': 'image_url'}),
             'price': forms.TextInput(attrs={'placeholder': 'price'}),

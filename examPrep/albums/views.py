@@ -4,7 +4,7 @@ from django.views.generic import CreateView, DetailView, UpdateView, DeleteView
 
 from albums.models import Album
 from common.utils import get_profile
-from albums.forms import AlbumCreateForm, AlbumEditForm
+from albums.forms import AlbumCreateForm, AlbumEditForm, AlbumDeleteForm
 
 
 class AlbumCreateView(CreateView):
@@ -36,6 +36,7 @@ class AlbumEditView(UpdateView):
 class AlbumDeleteView(DeleteView):
     model = Album
     template_name = 'album-delete.html'
+    form_class = AlbumDeleteForm
     pk_url_kwarg = 'id'
     success_url = reverse_lazy('home')
 
@@ -45,10 +46,7 @@ class AlbumDeleteView(DeleteView):
     def get_initial(self):
         return self.object.__dict__
 
-    # Попълва формата с текущите данни
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs.update({
-            'data': self.get_initial(),
-        })
-        return kwargs
+    # Проверяваме за невалидна, понеже то се опитва да я създаде а такава има
+    # а unique constraint не позволява повторно.
+    def form_invalid(self, form):
+        return self.form_valid(form)

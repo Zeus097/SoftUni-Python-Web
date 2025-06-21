@@ -16,3 +16,7 @@ class ProfileBaseForm(forms.ModelForm):
 
 class ProfileCreateForm(ProfileBaseForm):
     pass
+
+
+class ProfileDeleteForm(ProfileBaseForm):
+    pass

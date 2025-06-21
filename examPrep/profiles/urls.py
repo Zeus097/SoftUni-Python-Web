@@ -2,6 +2,6 @@ from django.urls import path, include
 from profiles import views
 
 urlpatterns = [
-    # path('details/', views.ProfileDetails.as_view(), name='profile-details'),
-    # path('delete/', views.ProfileDelete.as_view(), name='profile-delete'),
+    path('details/', views.ProfileDetailsView.as_view(), name='profile_details'),
+    path('delete/', views.ProfileDeleteView.as_view(), name='profile_delete'),
 ]
