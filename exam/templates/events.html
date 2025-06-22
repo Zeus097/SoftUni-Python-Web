@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Events page -->
+    
+    
+    {% if events %}
+        <!-- Display a heading if there are events -->
+        <h2>We have {{ events.count }} events in total.</h2>
+        
+        <section id="dashboard">
+        {% for event in events %}
+            <div class="post">
+                <h3 class="title">{{ event.slogan }}</h3>
+                
+                {% if event.banner_url %}
+                <img src="{{ event.banner_url }}" alt="{{ event.slogan }} img" />
+            {% else %}
+                <img src="https://cdn.pixabay.com/photo/2020/06/01/06/10/music-5245318_1280.jpg"
+                    alt="Where Guitars Roar and Legends Rise! img" />
+                {% endif %}
+        
+                <!-- event start time in format "D d M Y H:i" -->
+                <p class="description">{{ event.start_time|date:"D d M Y H:i" }}</p>
+                <!-- event location" -->
+                <p class="description">{{ event.location }}</p>
+                <!-- event details button -->
+                <a class="details-btn" href="{% url 'current-event-details' event.pk %}">Click for more</a>
+            </div>
+        {% endfor %}
+        </section>
+    {% else %}
+        <!-- Display a heading if there are NO events -->
+        <h2>No events so far.</h2>
+    {% endif %}
+{% endblock %}
