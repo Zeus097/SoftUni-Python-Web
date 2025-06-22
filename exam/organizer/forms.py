@@ -1,5 +1,4 @@
 from django import forms
-
 from organizer.models import Organizer
 
 
@@ -29,8 +28,6 @@ class OrganizerCreateForm(OrganizerBaseForm):
     pass
 
 
-# class OrganizerDetailsForm(OrganizerBaseForm):
-#     pass
+class OrganizerEditForm(OrganizerBaseForm):
+    pass
 
-# class OrganizerDeleteForm(OrganizerBaseForm):
-#     pass

@@ -46,6 +46,7 @@ class EventEditView(UpdateView):
     def get_success_url(self):
         return reverse_lazy('current-event-details', kwargs={'id': self.object.pk})
 
+
 class EventDeleteView(DeleteView):
     model = Event
     template_name = 'delete-event.html'
