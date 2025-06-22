@@ -1,6 +1,6 @@
 from django import forms
-from django.utils.timezone import now
 
+from event.mixins import ReadOnlyFieldsMixin
 from event.models import Event
 
 
@@ -30,5 +30,5 @@ class EventEditForm(EventBaseForm):
     pass
 
 
-class EventDeleteForm(EventBaseForm):
+class EventDeleteForm(ReadOnlyFieldsMixin, EventBaseForm):
     pass
