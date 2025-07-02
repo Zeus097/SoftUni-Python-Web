@@ -1,0 +1,8 @@
+#!/Users/vasildimitrov/Desktop/SoftUni_and_Projects_During_Leearning_Period/Programing_with_Python/Python_Web_Docs_&_Info/Github_Code/SoftUni-Python-Web/forumApp_version2/forumApp/.venv/bin/python3.12
+# -*- coding: utf-8 -*-
+import re
+import sys
+from django.core.management import execute_from_command_line
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
+    sys.exit(execute_from_command_line())

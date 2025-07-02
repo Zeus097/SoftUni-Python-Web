@@ -1,41 +1,23 @@
 from datetime import datetime
 
+from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.db import connection
 from django.db.models import Q
 from django.forms import modelform_factory
-from django.http import HttpRequest, HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.template.context_processors import request
 from django.urls import reverse, reverse_lazy
-from django.utils.decorators import classonlymethod, method_decorator
-from django.views import View
+from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView, RedirectView, CreateView, UpdateView, DeleteView, FormView, DetailView, \
     ListView
 from django.views.generic.edit import FormMixin
 
 from posts.decorators import measure_execution_time
-from posts.forms import PostCreateForm, PostDeleteForm, SearchForm, CommentForm, CommentFormSet, PostEditForm
+from posts.forms import PostCreateForm, PostDeleteForm, SearchForm, CommentFormSet
 from posts.mixins import TimeRestrictedMixin
 from posts.models import Post
-
-
-def index(request):
-    return render(request, 'index.html')
-
-# Simple example of Django under the hood
-# class MyView:
-#
-#     def dispatch(self, request, *args, **kwargs):
-#         if request.method == "GET":
-#             return self.get(request, *args, **kwargs)
-#         ...
-#
-#     @classonlymethod
-#     def as_view(cls):
-#
-#         def view(request, *args, **kwargs):
-#             self = cls()
-#             return self.dispatch(request, args, kwargs)
-#
-#         return view
 
 
 class IndexView(TemplateView):
@@ -58,13 +40,23 @@ class IndexView(TemplateView):
         return ['jhfqwkandoixeu', 'index.html']
 
 
+def approve_post(request, pk):
+    if request.method == "POST":
+        post = Post.objects.get(pk=pk)
+        post.approved = True
+        post.save()
+
+        return redirect('dashboard')
+
+
 @method_decorator(name='dispatch', decorator=measure_execution_time)
-class Dashboard(ListView):
+class Dashboard(ListView, PermissionRequiredMixin):
     model = Post
     template_name = "posts/dashboard.html"
     paginate_by = 4
     query_param = "query"
     form_class = SearchForm
+    permission_required = 'posts.approve_post'
 
     def get_context_data(self, *, object_list=None, **kwargs):
         kwargs.update({
@@ -77,6 +69,9 @@ class Dashboard(ListView):
         queryset = self.model.objects.all()
         search_value = self.request.GET.get(self.query_param)
 
+        if not self.has_permission():
+            queryset = queryset.filter(approved=True)
+
         if search_value:
             queryset = queryset.filter(
                 Q(title__icontains=search_value)
@@ -88,48 +83,11 @@ class Dashboard(ListView):
 
         return queryset
 
-
-def dashboard(request):
-    # search_form = SearchForm(request.GET)
-    posts = Post.objects.all()
-
-    # if request.method == "GET" and search_form.is_valid():
-    #     query = search_form.cleaned_data.get('query')
-    #     posts = posts.filter(
-    #         Q(title__icontains=query)
-    #             |
-    #         Q(content__icontains=query)
-    #             |
-    #         Q(author__icontains=query)
-    #     )
-
-    context = {
-        "posts": posts,
-        # "search_form": search_form,
-    }
-
-    return render(request, 'posts/dashboard.html', context)
-
-
-class CreatePost(TimeRestrictedMixin, CreateView):
+class CreatePost(LoginRequiredMixin, TimeRestrictedMixin, CreateView):
     model = Post
     form_class = PostCreateForm
     success_url = reverse_lazy('dashboard')
     template_name = 'posts/add-post.html'
-
-
-# def add_post(request):
-#     form = PostCreateForm(request.POST or None, request.FILES or None)
-#
-#     if request.method == "POST" and form.is_valid():
-#         form.save()
-#         return redirect('dashboard')
-#
-#     context = {
-#         "form": form,
-#     }
-#
-#     return render(request, 'posts/add-post.html', context)
 
 
 class EditPost(TimeRestrictedMixin, UpdateView):
@@ -142,27 +100,6 @@ class EditPost(TimeRestrictedMixin, UpdateView):
             return modelform_factory(Post, fields='__all__')
         else:
             return modelform_factory(Post, fields=('content',),)
-
-
-# def edit_post(request, pk: int):
-#     post = Post.objects.get(pk=pk)
-#
-#     if request.user.is_superuser:
-#         PostEditForm = modelform_factory(Post, fields='__all__')
-#     else:
-#         PostEditForm = modelform_factory(Post, fields=('content',),)
-#
-#     form = PostEditForm(request.POST or None, instance=post)
-#
-#     if request.method == "POST" and form.is_valid():
-#         form.save()
-#         return redirect('dashboard')
-#
-#     context = {
-#         "form": form,
-#     }
-#
-#     return render(request, 'posts/edit-post.html', context)
 
 
 class PostDetails(DetailView, FormMixin):
@@ -195,15 +132,6 @@ class PostDetails(DetailView, FormMixin):
 
 def post_details(request, pk: int):
     post = Post.objects.get(pk=pk)
-    # comment_form_set = CommentFormSet(request.POST or None)
-    #
-    # if request.method == "POST" and comment_form_set.is_valid():
-    #     for form in comment_form_set:
-    #         comment = form.save(commit=False)
-    #         comment.author = request.user.username
-    #         comment.post = post
-    #         comment.save()
-    #         return redirect('post-details', pk=post.pk)
 
     context = {
         "post": post,
@@ -223,20 +151,6 @@ class DeletePost(DeleteView, FormView):
         pk = self.kwargs.get(self.pk_url_kwarg)
         post = self.model.objects.get(pk=pk)
         return post.__dict__
-#
-# def delete_post(request, pk: int):
-#     post = Post.objects.get(pk=pk)
-#     form = PostDeleteForm(instance=post)
-#
-#     if request.method == "POST":
-#         post.delete()
-#         return redirect('dashboard')
-#
-#     context = {
-#         "form": form,
-#     }
-#
-#     return render(request, 'posts/delete-post.html', context)
 
 class MyRedirectView(RedirectView):
     # url = 'http://localhost:8000/dashboard/'
@@ -245,3 +159,15 @@ class MyRedirectView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):  # dynamic way
         return reverse('dashboard') + "?query=Django"
+
+
+def unsafe_view(request):
+    user_input = request.GET.get('username')
+    query = f"SELECT * FROM auth_user WHERE username = '{user_input}'"
+
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        rows = cursor.fetchall()
+
+    return JsonResponse(data={"data": rows})
+
