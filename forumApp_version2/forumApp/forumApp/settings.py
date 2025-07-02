@@ -86,7 +86,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'forumApp.wsgi.application'
 
 AUTHENTICATION_BACKENDS = [
-    'accounts.authentication.EmailBackend',  # try to authenticate with email
+    'accounts.authentication.CustomAuthBackend',  # try to authenticate with email
     'django.contrib.auth.backends.ModelBackend',  # fallback to authenticate with username
 ]
 
@@ -157,6 +157,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-AUTH_USER_MODEL = 'accounts.CustomUser'
+AUTH_USER_MODEL = 'accounts.AppUser'
 LOGIN_REDIRECT_URL = reverse_lazy('dashboard')
 LOGOUT_REDIRECT_URL = reverse_lazy('dashboard')
